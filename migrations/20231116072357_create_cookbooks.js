@@ -5,7 +5,6 @@
 exports.up = function (knex) {
   return knex.schema.createTable("cookbooks", (table) => {
     table.increments("id").primary().unique();
-    table.integer("recipe_id").unsigned().references("recipes.id");
     table.integer("user_id").unsigned().references("users.id");
     table.string("name").notNullable();
   });
