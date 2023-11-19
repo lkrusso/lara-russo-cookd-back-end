@@ -3,11 +3,12 @@ const knex = require("knex")(require("./knexfile"));
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const userRoutes = require("./controllers/user-controller");
+const PORT = process.env.SERVER_PORT || 5050;
+const userRoutes = require("./routes/user-routes");
 
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
 
-app.listen(process.env.SERVER_PORT);
+app.listen(PORT, console.log(`Listening on port ${PORT}`));
