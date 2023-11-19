@@ -1,4 +1,5 @@
 const knex = require("knex")(require("../knexfile"));
+const bcrypt = require("bcryptjs");
 
 const getUser = async (req, res) => {
   try {
@@ -27,4 +28,31 @@ const getUser = async (req, res) => {
   }
 };
 
-module.exports = { getUser };
+const createUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).send("Please fill in all required fields");
+    }
+
+    const hashedPassword = bcrypt.hashSync(password);
+
+    const newUser = { username, password: hashedPassword };
+
+    try {
+      await knex("users").insert(newUser);
+      res.status(201).send("Registered successfully");
+    } catch (error) {
+      console.error(error);
+      return res.status(400).send("Failed registration");
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send("Could not create user due to server-side error");
+  }
+};
+
+module.exports = { getUser, createUser };
