@@ -5,10 +5,12 @@ const app = express();
 const cors = require("cors");
 const PORT = process.env.SERVER_PORT || 5050;
 const userRoutes = require("./routes/user-routes");
+const recipeRoutes = require("./routes/recipe-routes");
 
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
+app.use("/api/recipes", recipeRoutes);
 
 app.listen(PORT, console.log(`Listening on port ${PORT}`));
