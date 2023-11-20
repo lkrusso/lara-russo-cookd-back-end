@@ -10,6 +10,7 @@ const recipeRoutes = require("./routes/recipe-routes");
 const ingredientRoutes = require("./routes/ingredient-routes");
 const instructionRoutes = require("./routes/instruction-routes");
 const cookbookRoutes = require("./routes/cookbook-routes");
+const authRoutes = require("./routes/auth-routes");
 
 app.use(cors());
 app.use(express.json());
@@ -24,5 +25,6 @@ app.use("/api/recipes", recipeRoutes);
 app.use("/api/ingredients", ingredientRoutes);
 app.use("/api/instructions", instructionRoutes);
 app.use("/api/cookbooks", cookbookRoutes);
+app.use("/api/auth", authRoutes);
 
 app.listen(PORT, console.log(`Listening on port ${PORT}`));
