@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const userLogin = async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    return res.status(404).send("Please fill in all fields");
+    return res.status(400).send("Please fill in all fields");
   }
   const user = await knex("users").where({ username: username }).first();
   if (!user) {
@@ -49,4 +49,31 @@ const userDetails = async (req, res) => {
   }
 };
 
-module.exports = { userLogin, userDetails };
+const createUser = async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).send("Please fill in all required fields");
+    }
+
+    const hashedPassword = bcrypt.hashSync(password);
+
+    const newUser = { username, password: hashedPassword };
+
+    try {
+      await knex("users").insert(newUser);
+      res.status(201).send("Registered successfully");
+    } catch (error) {
+      console.error(error);
+      return res.status(400).send("Failed registration");
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send("Could not create user due to server-side error");
+  }
+};
+
+module.exports = { userLogin, userDetails, createUser };
