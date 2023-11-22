@@ -22,4 +22,50 @@ const getInstructions = async (req, res) => {
   }
 };
 
-module.exports = { getInstructions };
+const createInstructions = async (req, res) => {
+  try {
+    const { recipe_id, instructionList } = req.body;
+    if (!recipe_id) {
+      return res.status(400).send("Please include the ID of the recipe");
+    }
+
+    if (!instructionList) {
+      return res
+        .status(400)
+        .send("Please include the instructions of the recipe");
+    }
+
+    const validRecipeID = await knex("recipes").where({ id: recipe_id });
+    if (!validRecipeID) {
+      return res
+        .status(400)
+        .send("The recipe ID sent was not valid. Please try again");
+    }
+
+    let instructionDetails = {};
+
+    for (let i = 0; i < instructionList.length; i++) {
+      instructionDetails = {
+        recipe_id: recipe_id,
+        instruction: instructionList[i].instruction,
+      };
+
+      await knex("instructions").insert(instructionDetails);
+    }
+
+    const addedInstructions = await knex("instructions").where({
+      recipe_id: recipe_id,
+    });
+
+    return res.status(200).send(addedInstructions);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send(
+        `Unable to create instructions for recipe with ID ${req.body.recipe_id} due to server-side error`
+      );
+  }
+};
+
+module.exports = { getInstructions, createInstructions };
