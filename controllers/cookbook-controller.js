@@ -22,4 +22,46 @@ const getCookbooks = async (req, res) => {
   }
 };
 
-module.exports = { getCookbooks };
+const createCookbook = async (req, res) => {
+  try {
+    const { user_id, name } = req.body;
+    if (!user_id || !name) {
+      return res
+        .status(400)
+        .send("Please ensure you have provided all information necessary");
+    }
+    if (typeof user_id !== "number") {
+      return res.status(400).send("Please ensure the user ID is a number");
+    }
+    const allUsers = await knex("users");
+    let isMatchingUser = false;
+
+    allUsers.forEach((user) => {
+      if (user.id === user_id) {
+        isMatchingUser = true;
+      }
+    });
+
+    if (!isMatchingUser) {
+      return res
+        .status(400)
+        .send("The user ID does not match. Please try again");
+    }
+
+    const newCookbook = { user_id, name };
+    await knex("cookbooks").insert(newCookbook);
+    const addedCookbookID = await knex("cookbooks")
+      .where({ user_id: newCookbook.user_id })
+      .where({ name: newCookbook.name })
+      .select("id");
+    res.status(200).send(addedCookbookID);
+  } catch (error) {
+    return res
+      .status(500)
+      .send(
+        `Unable to create a new cookbook due to server-side error: ${error}`
+      );
+  }
+};
+
+module.exports = { getCookbooks, createCookbook };
