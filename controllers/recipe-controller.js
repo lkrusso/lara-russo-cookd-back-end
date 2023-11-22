@@ -75,4 +75,49 @@ const createRecipe = async (req, res) => {
   }
 };
 
-module.exports = { getAllRecipes, createRecipe };
+const addToCookbook = async (req, res) => {
+  const { cookbookID, recipeList } = req.body;
+
+  if (!cookbookID || !recipeList) {
+    return res
+      .status(400)
+      .send("Please ensure you have provided all information necessary");
+  }
+
+  if (typeof cookbookID !== "number") {
+    return res.status(400).send("Please ensure that cookbook ID is a number");
+  }
+
+  const allCookbooks = await knex("cookbooks");
+  let isMatchingCookbook = false;
+
+  allCookbooks.forEach((cookbook) => {
+    if (cookbook.id === cookbookID) {
+      isMatchingCookbook = true;
+    }
+  });
+
+  if (!isMatchingCookbook) {
+    return res
+      .status(400)
+      .send("The cookbook ID does not match. Please try again");
+  }
+
+  recipeList.forEach(async (item) => {
+    const modifiedRecipe = await knex("recipes").where({ id: item.id }).first();
+    if (typeof modifiedRecipe.cookbook_id === "object") {
+      await knex("recipes")
+        .where({ id: item.id })
+        .update({ cookbook_id: cookbookID });
+    }
+  });
+
+  const updatedCookbook = await knex("recipes").where({
+    cookbook_id: cookbookID,
+  });
+
+  res.status(200).send(updatedCookbook);
+  return;
+};
+
+module.exports = { getAllRecipes, createRecipe, addToCookbook };
