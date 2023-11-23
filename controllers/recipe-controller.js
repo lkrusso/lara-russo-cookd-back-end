@@ -1,5 +1,19 @@
 const knex = require("knex")(require("../knexfile"));
 
+const getSingleRecipe = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const recipe = await knex("recipes").where({ id: id });
+    if (!recipe) {
+      return res.status(404).send(`Recipe with ID ${id} not found`);
+    }
+    res.status(200).send(recipe);
+  } catch (error) {
+    console.error(error);
+    res.status(400).send(`Unable to retrieve recipe with ID ${id}`);
+  }
+};
+
 const getAllRecipes = async (req, res) => {
   try {
     if (!req.body.id) {
@@ -142,4 +156,10 @@ const updateRecipe = async (req, res) => {
   }
 };
 
-module.exports = { getAllRecipes, createRecipe, addToCookbook, updateRecipe };
+module.exports = {
+  getSingleRecipe,
+  getAllRecipes,
+  createRecipe,
+  addToCookbook,
+  updateRecipe,
+};
