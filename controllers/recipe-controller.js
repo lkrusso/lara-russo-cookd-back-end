@@ -158,14 +158,44 @@ const updateRecipe = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   let { id } = req.params;
+
+  try {
+    const result = await knex("instructions").where({ recipe_id: id }).delete();
+    if (result === 0) {
+      return res
+        .status(404)
+        .send(`No instructions for the recipe ${id} were found`);
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send("Unable to delete instructions due to server-side error");
+  }
+  try {
+    const result = await knex("ingredients").where({ recipe_id: id }).delete();
+    if (result === 0) {
+      return res
+        .status(404)
+        .send(`No ingredients for the recipe ${id} were found`);
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send("Unable to delete ingredients due to server-side error");
+  }
+
   try {
     const result = await knex("recipes").where({ id: id }).del();
     if (result === 0) {
       return res.status(404).send(`Recipe with ID ${id} was not found`);
     }
-    res.sendStatus(204);
+    return res.sendStatus(204);
   } catch (error) {
-    res.status(500).send(`Unable to delete recipe with ID ${id}: ${error}`);
+    return res
+      .status(500)
+      .send(`Unable to delete recipe with ID ${id}: ${error}`);
   }
 };
 
