@@ -120,4 +120,26 @@ const addToCookbook = async (req, res) => {
   return;
 };
 
-module.exports = { getAllRecipes, createRecipe, addToCookbook };
+const updateRecipe = async (req, res) => {
+  const recipe = req.body;
+  const { id, title, duration, serves, cuisine_type } = req.body;
+  console.log(recipe);
+  try {
+    const updatedRecord = await knex("recipes")
+      .where({ id: id })
+      .update(recipe);
+
+    if (updatedRecord === 0) {
+      return res.status(404).send(`Recipe with ID ${id} was not found`);
+    }
+
+    const updatedRecipe = await knex("recipes").where({ id: id });
+    res.status(200).send(updatedRecipe[0]);
+    return;
+  } catch (error) {
+    res.status(500).send(`Unable to update recipe with ID ${id}: ${error}`);
+    return;
+  }
+};
+
+module.exports = { getAllRecipes, createRecipe, addToCookbook, updateRecipe };
