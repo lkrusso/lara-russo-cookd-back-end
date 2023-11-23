@@ -78,4 +78,42 @@ const createCookbook = async (req, res) => {
   }
 };
 
-module.exports = { getSingleCookbook, getCookbooks, createCookbook };
+const deleteCookbook = async (req, res) => {
+  let { id } = req.params;
+  try {
+    const result = await knex("recipes")
+      .where({ cookbook_id: id })
+      .update({ cookbook_id: null });
+    if (result === 0) {
+      return res
+        .status(404)
+        .send(`No recipes in cookbook with ${id} were found`);
+    }
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .send(
+        "Unable to update recipes + delete cookbook due to server-side error"
+      );
+  }
+
+  try {
+    const result = await knex("cookbooks").where({ id: id }).del();
+    if (result === 0) {
+      return res.status(404).send(`Cookbook with ID ${id} was not found`);
+    }
+    return res.sendStatus(204);
+  } catch (error) {
+    return res
+      .status(500)
+      .send(`Unable to delete recipe with ID ${id}: ${error}`);
+  }
+};
+
+module.exports = {
+  getSingleCookbook,
+  getCookbooks,
+  createCookbook,
+  deleteCookbook,
+};
