@@ -158,14 +158,11 @@ const updateRecipe = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   let { id } = req.params;
-
+  if (!id) {
+    return res.status(500).send("Please ensure to include recipe ID");
+  }
   try {
     const result = await knex("instructions").where({ recipe_id: id }).delete();
-    if (result === 0) {
-      return res
-        .status(404)
-        .send(`No instructions for the recipe ${id} were found`);
-    }
   } catch (error) {
     console.error(error);
     return res
@@ -174,11 +171,6 @@ const deleteRecipe = async (req, res) => {
   }
   try {
     const result = await knex("ingredients").where({ recipe_id: id }).delete();
-    if (result === 0) {
-      return res
-        .status(404)
-        .send(`No ingredients for the recipe ${id} were found`);
-    }
   } catch (error) {
     console.error(error);
     return res
@@ -189,7 +181,11 @@ const deleteRecipe = async (req, res) => {
   try {
     const result = await knex("recipes").where({ id: id }).del();
     if (result === 0) {
-      return res.status(404).send(`Recipe with ID ${id} was not found`);
+      return res
+        .status(404)
+        .send(
+          `Recipe with ID ${id} was not found and thus couldn't be deleted`
+        );
     }
     return res.sendStatus(204);
   } catch (error) {
