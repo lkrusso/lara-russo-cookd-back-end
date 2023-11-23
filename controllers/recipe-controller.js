@@ -158,9 +158,6 @@ const updateRecipe = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   let { id } = req.params;
-  if (!id) {
-    return res.status(500).send("Please ensure to include recipe ID");
-  }
   try {
     const result = await knex("instructions").where({ recipe_id: id }).delete();
   } catch (error) {

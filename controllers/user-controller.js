@@ -27,4 +27,54 @@ const getUser = async (req, res) => {
   }
 };
 
-module.exports = { getUser };
+const deleteUser = async (req, res) => {
+  let errors = [];
+  let { id } = req.params;
+
+  const userRecipes = await knex("recipes").where({ user_id: id }).select("id");
+  userRecipes.forEach(async (recipe) => {
+    try {
+      await knex("instructions").where({ recipe_id: recipe.id }).delete();
+    } catch (error) {
+      console.error(error);
+      errors.push(`Unable to delete instructions: ${error}`);
+    }
+    try {
+      await knex("ingredients").where({ recipe_id: recipe.id }).delete();
+    } catch (error) {
+      console.error(error);
+      errors.push(`Unable to delete ingredients: ${error}`);
+    }
+  });
+
+  try {
+    await knex("cookbooks").where({ user_id: id }).delete();
+  } catch (error) {
+    errors.push(`Unable to delete cookbooks: ${error}`);
+  }
+
+  try {
+    await knex("recipes").where({ user_id: id }).del();
+  } catch (error) {
+    errors.push(
+      `Unable to delete recipes made by user with ID ${id}: ${error}`
+    );
+  }
+
+  try {
+    const result = await knex("users").where({ id: id });
+    if (result === 0) {
+      errors.push(`This user doesn't exist`);
+    }
+  } catch (error) {
+    errors.push(`Unable to delete user: ${error}`);
+  }
+
+  if (errors.length > 0) {
+    return res.status(424).send(errors);
+  }
+
+  return res.sendStatus(204);
+};
+
+module.exports = { getUser, deleteUser };
