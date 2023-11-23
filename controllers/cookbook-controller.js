@@ -1,5 +1,19 @@
 const knex = require("knex")(require("../knexfile"));
 
+const getSingleCookbook = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const cookbook = await knex("cookbooks").where({ id: id });
+    if (!cookbook) {
+      return res.status(404).send(`Cookbook with ID ${id} not found`);
+    }
+    res.status(200).send(cookbook);
+  } catch (error) {
+    console.error(error);
+    res.status(400).send(`Unable to retrieve cookbook with ID ${id}`);
+  }
+};
+
 const getCookbooks = async (req, res) => {
   try {
     if (!req.body.id) {
@@ -64,4 +78,4 @@ const createCookbook = async (req, res) => {
   }
 };
 
-module.exports = { getCookbooks, createCookbook };
+module.exports = { getSingleCookbook, getCookbooks, createCookbook };
