@@ -158,6 +158,7 @@ const updateRecipe = async (req, res) => {
 
 const deleteRecipe = async (req, res) => {
   let { id } = req.params;
+
   try {
     const result = await knex("instructions").where({ recipe_id: id }).delete();
   } catch (error) {

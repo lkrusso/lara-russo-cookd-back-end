@@ -31,6 +31,11 @@ const deleteUser = async (req, res) => {
   let errors = [];
   let { id } = req.params;
 
+  const matchingUser = await knex("users").where({ id: id });
+  if (!matchingUser) {
+    return res.status(404).send(`The user with ID ${id} could not be found`);
+  }
+
   const userRecipes = await knex("recipes").where({ user_id: id }).select("id");
   userRecipes.forEach(async (recipe) => {
     try {
@@ -48,13 +53,7 @@ const deleteUser = async (req, res) => {
   });
 
   try {
-    await knex("cookbooks").where({ user_id: id }).delete();
-  } catch (error) {
-    errors.push(`Unable to delete cookbooks: ${error}`);
-  }
-
-  try {
-    await knex("recipes").where({ user_id: id }).del();
+    await knex("recipes").where({ user_id: id }).delete();
   } catch (error) {
     errors.push(
       `Unable to delete recipes made by user with ID ${id}: ${error}`
@@ -62,10 +61,13 @@ const deleteUser = async (req, res) => {
   }
 
   try {
-    const result = await knex("users").where({ id: id });
-    if (result === 0) {
-      errors.push(`This user doesn't exist`);
-    }
+    await knex("cookbooks").where({ user_id: id }).delete();
+  } catch (error) {
+    errors.push(`Unable to delete cookbooks: ${error}`);
+  }
+
+  try {
+    await knex("users").where({ id: id }).delete();
   } catch (error) {
     errors.push(`Unable to delete user: ${error}`);
   }
