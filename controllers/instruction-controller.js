@@ -83,7 +83,7 @@ const updateInstructions = async (req, res) => {
         return res
           .status(404)
           .send(
-            `Instruction with ID ${instruction.id} of recipe with ID ${instruciton.recipe_id} was not found`
+            `Instruction with ID ${instruction.id} of recipe with ID ${instruction.recipe_id} was not found`
           );
       }
 

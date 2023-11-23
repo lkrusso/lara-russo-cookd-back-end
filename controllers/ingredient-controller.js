@@ -88,4 +88,39 @@ const createIngredients = async (req, res) => {
   }
 };
 
-module.exports = { getIngredients, createIngredients };
+const updateIngredients = async (req, res) => {
+  const ingredients = req.body;
+  let updatedIngredientList = [];
+  for (let i = 0; i < ingredients.length; i++) {
+    const ingredient = ingredients[i];
+    try {
+      const updatedRecord = await knex("ingredients")
+        .where({ id: ingredient.id })
+        .update(ingredient);
+
+      if (updatedRecord === 0) {
+        return res
+          .status(404)
+          .send(
+            `Ingredient with ID ${ingredient.id} of recipe with ID ${ingredient.recipe_id} was not found`
+          );
+      }
+
+      const updatedIngredient = await knex("ingredients").where({
+        id: ingredient.id,
+      });
+      updatedIngredientList.push(updatedIngredient[0]);
+    } catch (error) {
+      res
+        .status(500)
+        .send(
+          `Unable to update the ingredient with ID ${ingredient.id} of recipe with ID ${ingredient.recipe_id}: ${error}`
+        );
+      return;
+    }
+  }
+  res.status(200).send(updatedIngredientList);
+  return;
+};
+
+module.exports = { getIngredients, createIngredients, updateIngredients };
