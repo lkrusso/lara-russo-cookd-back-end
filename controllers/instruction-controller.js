@@ -68,4 +68,40 @@ const createInstructions = async (req, res) => {
   }
 };
 
-module.exports = { getInstructions, createInstructions };
+const updateInstructions = async (req, res) => {
+  const { instructions } = req.body;
+  let updatedInstructionList = [];
+
+  for (let i = 0; i < instructions.length; i++) {
+    const instruction = instructions[i];
+    try {
+      const updatedRecord = await knex("instructions")
+        .where({ id: instruction.id })
+        .update(instruction);
+
+      if (updatedRecord === 0) {
+        return res
+          .status(404)
+          .send(
+            `Instruction with ID ${instruction.id} of recipe with ID ${instruciton.recipe_id} was not found`
+          );
+      }
+
+      const updatedInstruction = await knex("instructions").where({
+        id: instruction.id,
+      });
+      updatedInstructionList.push(updatedInstruction[0]);
+    } catch (error) {
+      res
+        .status(500)
+        .send(
+          `Unable to update the instruction with ID ${instruction.id} of recipe with ID ${instruction.recipe_id}: ${error}`
+        );
+      return;
+    }
+  }
+  res.status(200).send(updatedInstructionList);
+  return;
+};
+
+module.exports = { getInstructions, createInstructions, updateInstructions };
