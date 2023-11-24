@@ -87,6 +87,7 @@ const createIngredients = async (req, res) => {
 
 const updateIngredients = async (req, res) => {
   const ingredients = req.body;
+  console.log(ingredients);
   let updatedIngredientList = [];
   for (let i = 0; i < ingredients.length; i++) {
     const ingredient = ingredients[i];

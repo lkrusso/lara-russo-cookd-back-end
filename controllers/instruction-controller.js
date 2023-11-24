@@ -71,8 +71,9 @@ const createInstructions = async (req, res) => {
 };
 
 const updateInstructions = async (req, res) => {
-  const { instructions } = req.body;
+  const instructions = req.body.instructions;
   let updatedInstructionList = [];
+  console.log(instructions);
 
   for (let i = 0; i < instructions.length; i++) {
     const instruction = instructions[i];

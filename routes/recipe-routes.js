@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const recipeController = require("../controllers/recipe-controller");
 
-router.route("/user/:id").get(recipeController.getAllUserRecipes);
+router.route("/users/:id").get(recipeController.getAllUserRecipes);
 router
   .route("/:id")
   .get(recipeController.getSingleRecipe)
