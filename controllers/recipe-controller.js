@@ -14,14 +14,24 @@ const getSingleRecipe = async (req, res) => {
   }
 };
 
-const getAllRecipes = async (req, res) => {
+const getAllUserRecipes = async (req, res) => {
   try {
-    if (!req.body.id) {
+    if (!req.params.id) {
       return res.status(400).send("Please include the ID of the user");
     }
-    const recipes = await knex("recipes").where({ user_id: req.body.id });
-    if (!recipes) {
-      return res.status(404).send("No recipes found");
+
+    const matchingUser = await knex("users").where({ id: req.params.id });
+    if (matchingUser.length === 0) {
+      return res
+        .status(404)
+        .send(`The user with ID ${req.params.id} does not exist`);
+    }
+
+    const recipes = await knex("recipes").where({ user_id: req.params.id });
+    if (recipes.length === 0) {
+      return res
+        .status(404)
+        .send(`No recipes found by user with ID ${req.params.id}`);
     }
     res.status(201).send(recipes);
   } catch (error) {
@@ -29,7 +39,7 @@ const getAllRecipes = async (req, res) => {
     return res
       .status(500)
       .send(
-        `Unable to get ${req.body.username}'s recipes due to server-side error`
+        `Unable to get the recipes of user with ID ${req.params.id} due to server-side error`
       );
   }
 };
@@ -195,7 +205,7 @@ const deleteRecipe = async (req, res) => {
 
 module.exports = {
   getSingleRecipe,
-  getAllRecipes,
+  getAllUserRecipes,
   createRecipe,
   addToCookbook,
   updateRecipe,
