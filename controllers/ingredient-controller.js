@@ -2,31 +2,28 @@ const knex = require("knex")(require("../knexfile"));
 
 const getIngredients = async (req, res) => {
   try {
-    if (!req.body.recipe_id) {
+    if (!req.params.id) {
       return res.status(400).send("Please include the ID of the recipe");
     }
 
-    const allRecipes = await knex("recipes");
-    let isMatchingRecipe = false;
+    const matchingRecipe = await knex("recipes").where({ id: req.params.id });
 
-    allRecipes.forEach((recipe) => {
-      if (recipe.id === req.body.recipe_id) {
-        isMatchingRecipe = true;
-      }
-    });
-
-    if (!isMatchingRecipe) {
+    if (!matchingRecipe) {
       return res
-        .status(400)
-        .send("The recipe ID does not exist in the DB. Please try again");
+        .status(404)
+        .send(
+          `The recipe with ID ${req.params.id} does not exist in the DB. Please try again`
+        );
     }
 
     const ingredients = await knex("ingredients").where({
-      recipe_id: req.body.recipe_id,
+      recipe_id: req.params.id,
     });
 
     if (ingredients.length === 0) {
-      return res.status(404).send("No ingredients found");
+      return res
+        .status(404)
+        .send(`No ingredients for recipe with ID ${req.params.id} were found`);
     }
 
     res.status(201).send(ingredients);
@@ -35,7 +32,7 @@ const getIngredients = async (req, res) => {
     return res
       .status(500)
       .send(
-        `Unable to get ingredients for recipe with ID ${req.body.id} due to server-side error`
+        `Unable to get ingredients for recipe with ID ${req.params.id} due to server-side error`
       );
   }
 };
