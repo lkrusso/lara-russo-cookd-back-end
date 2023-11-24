@@ -16,14 +16,16 @@ const getSingleCookbook = async (req, res) => {
 
 const getCookbooks = async (req, res) => {
   try {
-    if (!req.body.id) {
+    if (!req.params.id) {
       return res.status(400).send("Please include the ID of the cookbook");
     }
     const cookbooks = await knex("cookbooks").where({
-      user_id: req.body.id,
+      user_id: req.params.id,
     });
     if (cookbooks.length === 0) {
-      return res.status(404).send("No cookbooks found");
+      return res
+        .status(404)
+        .send(`No cookbooks by user with ID ${req.params.id} were found`);
     }
     res.status(201).send(cookbooks);
   } catch (error) {
@@ -31,7 +33,7 @@ const getCookbooks = async (req, res) => {
     return res
       .status(500)
       .send(
-        `Unable to get cookbooks for user with ID ${req.body.id} due to server-side error`
+        `Unable to get cookbooks for user with ID ${req.params.id} due to server-side error`
       );
   }
 };
