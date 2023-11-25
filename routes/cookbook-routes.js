@@ -7,5 +7,6 @@ router
   .get(cookbookController.getSingleCookbook)
   .delete(cookbookController.deleteCookbook);
 router.route("/add").post(cookbookController.createCookbook);
+router.route("/:id/recipes").get(cookbookController.getCookbookRecipes);
 
 module.exports = router;

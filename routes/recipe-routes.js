@@ -3,6 +3,9 @@ const recipeController = require("../controllers/recipe-controller");
 
 router.route("/users/:id").get(recipeController.getAllUserRecipes);
 router
+  .route("/users/nocookbooks/:id")
+  .get(recipeController.getNonCookbookRecipes);
+router
   .route("/:id")
   .get(recipeController.getSingleRecipe)
   .delete(recipeController.deleteRecipe);

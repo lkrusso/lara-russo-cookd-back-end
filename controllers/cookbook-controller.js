@@ -113,9 +113,41 @@ const deleteCookbook = async (req, res) => {
   }
 };
 
+const getCookbookRecipes = async (req, res) => {
+  const cookbookID = req.params.id;
+  if (!cookbookID) {
+    return res.status(400).send("Please include the ID of the cookbook");
+  }
+
+  try {
+    const validCookbook = await knex("cookbooks").where({ id: cookbookID });
+    if (validCookbook.length === 0) {
+      return res
+        .status(404)
+        .send(`Cookbook with ID ${cookbookID} was not found`);
+    }
+    const recipes = await knex("recipes").where({ cookbook_id: cookbookID });
+
+    if (recipes.length === 0) {
+      return res
+        .status(404)
+        .send(`There are no recipes in cookbook with ID ${cookbookID}`);
+    }
+
+    return res.status(200).send(recipes);
+  } catch (error) {
+    return res
+      .status(500)
+      .send(
+        `Unable to get the recipes from cookbook with ID ${cookbookID} due to a server-side error: ${error}`
+      );
+  }
+};
+
 module.exports = {
   getSingleCookbook,
   getCookbooks,
   createCookbook,
   deleteCookbook,
+  getCookbookRecipes,
 };

@@ -14,6 +14,40 @@ const getSingleRecipe = async (req, res) => {
   }
 };
 
+const getNonCookbookRecipes = async (req, res) => {
+  try {
+    const userID = req.params.id;
+    if (!userID) {
+      return res.status(400).send("Please include the ID of the user");
+    }
+
+    const matchingUser = await knex("users").where({ id: userID });
+    if (matchingUser.length === 0) {
+      return res
+        .status(404)
+        .send(`The user with ID ${req.params.id} does not exist`);
+    }
+
+    const filteredRecipes = await knex("recipes")
+      .where({ user_id: userID })
+      .whereNull("cookbook_id");
+
+    if (filteredRecipes.length === 0) {
+      return res
+        .status(404)
+        .send(`No non-cookbook recipes found by user with ID ${userID}`);
+    }
+
+    return res.status(200).send(filteredRecipes);
+  } catch (error) {
+    return res
+      .status(500)
+      .send(
+        `Unable to get filtered recipes due to server-side error: ${error}`
+      );
+  }
+};
+
 const getAllUserRecipes = async (req, res) => {
   try {
     if (!req.params.id) {
@@ -210,4 +244,5 @@ module.exports = {
   addToCookbook,
   updateRecipe,
   deleteRecipe,
+  getNonCookbookRecipes,
 };
