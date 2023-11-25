@@ -57,6 +57,11 @@ const createUser = async (req, res) => {
       return res.status(400).send("Please fill in all required fields");
     }
 
+    const existingUser = await knex("users").where({ username: username });
+    if (existingUser !== 0) {
+      return res.status(400).send("Please sign up using a unique email");
+    }
+
     const hashedPassword = bcrypt.hashSync(password);
 
     const newUser = { username, password: hashedPassword };
