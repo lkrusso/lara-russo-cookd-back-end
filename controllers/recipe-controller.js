@@ -205,6 +205,13 @@ const deleteRecipe = async (req, res) => {
 
   try {
     const result = await knex("instructions").where({ recipe_id: id }).delete();
+    if (result === 0) {
+      return res
+        .status(404)
+        .send(
+          `The instructions of recipe with ID ${id} were not found and thus couldn't be deleted`
+        );
+    }
   } catch (error) {
     console.error(error);
     return res
@@ -213,6 +220,13 @@ const deleteRecipe = async (req, res) => {
   }
   try {
     const result = await knex("ingredients").where({ recipe_id: id }).delete();
+    if (result === 0) {
+      return res
+        .status(404)
+        .send(
+          `The ingredients of recipe with ID ${id} were not found and thus couldn't be deleted`
+        );
+    }
   } catch (error) {
     console.error(error);
     return res

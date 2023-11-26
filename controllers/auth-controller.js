@@ -27,7 +27,7 @@ const userLogin = async (req, res) => {
       .status(500)
       .send("Unable to generate token due to server-side error");
   }
-  res.status(201).send({ token });
+  res.status(201).send({ token, id: user.id });
 };
 
 const userDetails = async (req, res) => {
@@ -42,6 +42,7 @@ const userDetails = async (req, res) => {
       .where({ id: decodedToken.id })
       .first();
     delete loggedInUser.password;
+    console.log(loggedInUser);
     res.status(201).send(loggedInUser);
   } catch (error) {
     console.error(error);
