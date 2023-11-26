@@ -86,11 +86,6 @@ const deleteCookbook = async (req, res) => {
     const result = await knex("recipes")
       .where({ cookbook_id: id })
       .update({ cookbook_id: null });
-    if (result === 0) {
-      return res
-        .status(404)
-        .send(`No recipes in cookbook with ${id} were found`);
-    }
   } catch (error) {
     console.error(error);
     return res
@@ -102,9 +97,10 @@ const deleteCookbook = async (req, res) => {
 
   try {
     const result = await knex("cookbooks").where({ id: id }).del();
-    if (result === 0) {
-      return res.status(404).send(`Cookbook with ID ${id} was not found`);
-    }
+    console.log(result);
+    // if (result !== 0) {
+    //   return res.status(404).send(`Cookbook with ID ${id} was not found`);
+    // }
     return res.sendStatus(204);
   } catch (error) {
     return res
