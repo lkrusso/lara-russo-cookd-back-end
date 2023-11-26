@@ -98,9 +98,6 @@ const deleteCookbook = async (req, res) => {
   try {
     const result = await knex("cookbooks").where({ id: id }).del();
     console.log(result);
-    // if (result !== 0) {
-    //   return res.status(404).send(`Cookbook with ID ${id} was not found`);
-    // }
     return res.sendStatus(204);
   } catch (error) {
     return res
