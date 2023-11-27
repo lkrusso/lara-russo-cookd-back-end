@@ -137,10 +137,52 @@ const getCookbookRecipes = async (req, res) => {
   }
 };
 
+const updateCookbook = async (req, res) => {
+  const { id, name, deCheckedRecipes } = req.body;
+
+  if (deCheckedRecipes.length !== 0) {
+    deCheckedRecipes.forEach(async (recipe) => {
+      try {
+        const result = await knex("recipes")
+          .where({ id: recipe.id })
+          .update({ cookbook_id: null });
+        if (result === 0) {
+          return res
+            .status(404)
+            .send(
+              `Unable to update recipe with ID ${recipe.id} and thus couldn't update cookbook`
+            );
+        }
+      } catch (error) {
+        return res
+          .status(500)
+          .send(
+            `Unable to update recipe with the ID ${recipe.id} due to server-side error: ${error}`
+          );
+      }
+    });
+  }
+
+  try {
+    await knex("cookbooks").where({ id: id }).update({ name: name });
+  } catch (error) {
+    return res
+      .status(500)
+      .send(
+        `Unable to update cookbook with the ID ${id} due to server-side error`
+      );
+  }
+
+  const updatedCookbook = await knex("cookbooks").where({ id: id });
+
+  return res.status(200).send(updatedCookbook);
+};
+
 module.exports = {
   getSingleCookbook,
   getCookbooks,
   createCookbook,
   deleteCookbook,
   getCookbookRecipes,
+  updateCookbook,
 };
