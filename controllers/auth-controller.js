@@ -12,7 +12,7 @@ const userLogin = async (req, res) => {
     return res.status(400).send("Invalid email");
   }
 
-  const isPasswordCorrect = password === user.password;
+  const isPasswordCorrect = bcrypt.compareSync(password, user.password);
   if (!isPasswordCorrect) {
     return res.status(400).send("Invalid password");
   }
