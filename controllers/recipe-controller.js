@@ -10,7 +10,7 @@ const getSingleRecipe = async (req, res) => {
     res.status(200).send(recipe);
   } catch (error) {
     console.error(error);
-    res.status(400).send(`Unable to retrieve recipe with ID ${id}`);
+    res.status(500).send(`Unable to retrieve recipe with ID ${id}`);
   }
 };
 
